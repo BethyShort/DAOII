@@ -1,4 +1,5 @@
 package accesoDatos.oracle;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -7,20 +8,21 @@ import accesoDatos.DaoFactory;
 import accesoDatos.cfg.def.TableName;
 import accesoDatos.interfaces.DaoUpdate;
 
-public class OracleUpdate implements DaoUpdate {
+public class OracleUpdate < T extends Serializable > implements DaoUpdate<T> {
 
-	DaoFactory fac = null;
+	DaoFactory<T> fac = null;
+	private OracleSpecifics<T> oraSpecifics=new OracleSpecifics<T>();
 
-	OracleUpdate(DaoFactory fac) {
+	OracleUpdate(DaoFactory<T> fac) {
 		this.fac = fac;
 	}
 
 	@Override
-	public <T> boolean putInto(Connection con, TableName tableName, T oldPojo,
+	public boolean putInto(Connection con, TableName tableName, T oldPojo,
 			T currentPojo) throws SQLException {
 		PreparedStatement ps = null;
 		try {
-			ps = OracleSpecifics.<T> getPreparedUpdate(con, tableName, oldPojo,
+			ps = oraSpecifics.getPreparedUpdate(con, tableName, oldPojo,
 					currentPojo);
 			ps.execute();
 		} finally {

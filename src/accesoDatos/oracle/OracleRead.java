@@ -1,4 +1,5 @@
 package accesoDatos.oracle;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,16 +12,16 @@ import accesoDatos.cfg.def.QueryType;
 import accesoDatos.cfg.def.TableName;
 import accesoDatos.interfaces.DaoRead;
 
-public class OracleRead implements DaoRead {
+public class OracleRead < T extends Serializable > implements DaoRead<T> {
 
-	DaoFactory fac = null;
+	private DaoFactory<T> fac;
+	private OracleSpecifics<T> oraSpecifics=new OracleSpecifics<T>();
 
-	OracleRead(DaoFactory fac) throws SQLException {
+	OracleRead(DaoFactory<T> fac) throws SQLException {
 		this.fac = fac;
 	}
 
-	@SuppressWarnings("unchecked")
-	public <T> List<T> getAll(Connection con, TableName tableName)
+	public List<T> getAll(Connection con, TableName tableName)
 			throws SQLException {
 		List<T> list = new ArrayList<T>();
 		PreparedStatement ps = null;
@@ -29,7 +30,7 @@ public class OracleRead implements DaoRead {
 			ps = con.prepareStatement("select * from " + tableName);
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				list.add((T) OracleSpecifics
+				list.add((T) oraSpecifics
 						.getPojoFromResultSet(tableName, rs));
 			}
 		} finally {
@@ -38,8 +39,7 @@ public class OracleRead implements DaoRead {
 		return list;
 	}
 
-	@SuppressWarnings("unchecked")
-	public <T> List<T> getAllForInput(Connection con, TableName tableName,
+	public List<T> getAllForInput(Connection con, TableName tableName,
 			String columnName, String searchValue) throws SQLException {
 		List<T> list = new ArrayList<T>();
 		PreparedStatement ps = null;
@@ -51,7 +51,7 @@ public class OracleRead implements DaoRead {
 			ps = con.prepareStatement(statement.toString());
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				list.add((T) OracleSpecifics
+				list.add((T) oraSpecifics
 						.getPojoFromResultSet(tableName, rs));
 			}
 		} finally {
@@ -61,18 +61,18 @@ public class OracleRead implements DaoRead {
 	}
 
 	@Override
-	public <T> T getPojoForPrimarKey(Connection con, TableName tableName,
+	public T getPojoForPrimarKey(Connection con, TableName tableName,
 			String primaryKey) throws SQLException {
 		T currentPojo = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
-			String queryString = OracleSpecifics.queryString(tableName,
+			String queryString = oraSpecifics.queryString(tableName,
 					primaryKey, QueryType.READ);
 			ps = con.prepareStatement(queryString);
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				currentPojo = OracleSpecifics.getPojoFromResultSet(tableName,
+				currentPojo = oraSpecifics.getPojoFromResultSet(tableName,
 						rs);
 			}
 		} finally {
@@ -82,7 +82,7 @@ public class OracleRead implements DaoRead {
 	}
 
 	@Override
-	public <T> boolean alreadyExisting(Connection con, TableName tableName,
+	public boolean alreadyExisting(Connection con, TableName tableName,
 			String primaryKey) throws SQLException {
 		if (getPojoForPrimarKey(con, tableName, primaryKey) != null) {
 			return true;
@@ -92,9 +92,9 @@ public class OracleRead implements DaoRead {
 	}
 
 	@Override
-	public <T> boolean alreadyExisting(Connection con, TableName tableName,
+	public boolean alreadyExisting(Connection con, TableName tableName,
 			T currentPojo) throws SQLException {
-		String primaryKey = OracleSpecifics.<T> getPrimaryKey(tableName,
+		String primaryKey = oraSpecifics.getPrimaryKey(tableName,
 				currentPojo);
 		if (alreadyExisting(con, tableName, primaryKey) == false) {
 			return false;

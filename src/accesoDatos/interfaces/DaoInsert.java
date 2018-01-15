@@ -1,12 +1,13 @@
 package accesoDatos.interfaces;
 
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
 
 import accesoDatos.cfg.def.TableName;
 
-public interface DaoInsert {
+public interface DaoInsert < T extends Serializable >{
 
-	<T> boolean putInto(Connection con, TableName tableName,
+	boolean putInto(Connection con, TableName tableName,
 			T currentPojo, boolean running) throws SQLException;
 }

@@ -1,4 +1,5 @@
 package accesoDatos.oracle;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -8,25 +9,25 @@ import accesoDatos.cfg.def.QueryType;
 import accesoDatos.cfg.def.TableName;
 import accesoDatos.interfaces.DaoDelete;
 
-public class OracleDelete implements DaoDelete {
-	DaoFactory fac = null;
+public class OracleDelete < T extends Serializable > implements DaoDelete<T> {
+	private DaoFactory<T> fac = null;
+	private OracleSpecifics<T> oraSpecifics=new OracleSpecifics<T>();
 
-	public OracleDelete(OracleFactory oracleFactory) {
+	public OracleDelete(OracleFactory<T> oracleFactory) {
 		fac = oracleFactory;
 	}
 
 	@Override
-	public <T> boolean deleteFrom(Connection con, TableName tableName,
+	public boolean deleteFrom(Connection con, TableName tableName,
 			T currentPojo) throws SQLException {
 		PreparedStatement ps = null;
 		try {
-			if (fac.getDAORead().<T> alreadyExisting(con, tableName,
-					currentPojo) == false) {
+			if (!fac.getDAORead().alreadyExisting(con, tableName,currentPojo)) 
 				return false;
-			}
-			String primaryKey = OracleSpecifics.<T> getPrimaryKey(tableName,
+			
+			String primaryKey = oraSpecifics.getPrimaryKey(tableName,
 					currentPojo);
-			ps = con.prepareStatement(OracleSpecifics.queryString(tableName,
+			ps = con.prepareStatement(oraSpecifics.queryString(tableName,
 					primaryKey, QueryType.DELETE));
 			ps.execute();
 		} finally {

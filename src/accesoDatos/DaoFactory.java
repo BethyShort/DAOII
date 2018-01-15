@@ -1,5 +1,6 @@
 package accesoDatos;
 
+import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,20 +14,16 @@ import accesoDatos.interfaces.DaoRead;
 import accesoDatos.interfaces.DaoUpdate;
 import accesoDatos.oracle.OracleFactory;
 
-public abstract class DaoFactory {
+public abstract class DaoFactory<T extends Serializable> {
 
 	// Abstract Instance methods
-	public abstract DaoInsert getDAOInsert() throws SQLException;
-
-	public abstract DaoRead getDAORead() throws SQLException;
-
-	public abstract DaoDelete getDAODelete();
-
-	public abstract DaoUpdate getDAOUpdate();
+	public abstract DaoInsert<T> getDAOInsert() throws SQLException;
+	public abstract DaoRead<T> getDAORead() throws SQLException;
+	public abstract DaoDelete<T> getDAODelete();
+	public abstract DaoUpdate<T> getDAOUpdate();
 
 	// Concrete Class Methods
-	public static DaoFactory factoryProducer(DatabaseType db)
-			throws NamingException {
+	public static DaoFactory factoryProducer(DatabaseType db) throws NamingException {
 		switch (db) {
 		case Oracle:
 			return new OracleFactory();

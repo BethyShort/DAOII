@@ -1,4 +1,5 @@
 package accesoDatos.oracle;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,10 +10,10 @@ import accesoDatos.Student;
 import accesoDatos.cfg.def.QueryType;
 import accesoDatos.cfg.def.TableName;
 
-public class OracleSpecifics {
+public class OracleSpecifics < T extends Serializable > {
 
 
-	static String queryString(TableName tableName, String keyValue,
+	public String queryString(TableName tableName, String keyValue,
 			QueryType type) {
 		StringBuilder firstHalf = new StringBuilder();
 		switch (type) {
@@ -33,7 +34,7 @@ public class OracleSpecifics {
 		}
 	}
 
-	static <T> String getPrimaryKey(TableName tableName, T currentPojo) {
+	public String getPrimaryKey(TableName tableName, T currentPojo) {
 
 		switch (tableName) {
 		case STUDENT_TABLE:
@@ -45,7 +46,7 @@ public class OracleSpecifics {
 
 	// These functions call table-specific functions
 	@SuppressWarnings("unchecked")
-	static <T> T getPojoFromResultSet(TableName tableName, ResultSet rs)
+	public T getPojoFromResultSet(TableName tableName, ResultSet rs)
 			throws SQLException {
 
 		switch (tableName) {
@@ -56,7 +57,7 @@ public class OracleSpecifics {
 		}
 	}
 
-	static <T> PreparedStatement getPreparedInsert(Connection con,
+	public PreparedStatement getPreparedInsert(Connection con,
 			TableName tableName, T currentPojo, boolean running)
 			throws SQLException {
 
@@ -75,7 +76,7 @@ public class OracleSpecifics {
 
 	}
 
-	static <T> PreparedStatement getPreparedUpdate(Connection con,
+	public PreparedStatement getPreparedUpdate(Connection con,
 			TableName tableName, T oldPojo, T currentPojo) throws SQLException {
 
 		switch (tableName) {

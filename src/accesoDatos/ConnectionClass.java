@@ -21,6 +21,7 @@ public class ConnectionClass {
 		case Oracle:
 			this.ds = (DataSource) ctx
 					.lookup("java:/comp/env/jdbc/OracleSource");
+			System.out.println("salida");
 			break;
 		default:
 		}
